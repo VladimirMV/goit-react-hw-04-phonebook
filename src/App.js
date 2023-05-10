@@ -98,20 +98,3 @@ class App extends Component {
 }
 
 export default App;
-
-// This code is a React component called "App" that represents a simple phonebook application.
-// It imports necessary components from respective files and libraries,
-// that are then used to render contacts in a container with a filter feature.
-
-// The initial state of "App" component includes an array of contacts with their respective IDs,
-// names and phone numbers, and an empty filter property.
-
-// The component has several functions such as addContact, deleteContact, changeFilter,
-// and getVisibleContacts that manipulate state based on user input or data changes.
-
-// The render function uses the state and variables with their respective values
-// to conditionally render UI elements.This includes a few headings, a contact form,
-// a filtered search bar, and a  contact list that display contacts added by users.
-
-// The rendered UI elements allow users to view, add, filter, and delete contacts
-// in the application.
