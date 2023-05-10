@@ -90,7 +90,7 @@ class App extends Component {
             onDeleteContact={this.deleteContact}
           />
         ) : (
-          <p>Your phonebook is empty. Please add contact.</p>
+          <p>Your phonebook is empty. Please add contact. </p>
         )}
       </Container>
     );
