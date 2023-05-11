@@ -1,100 +1,72 @@
-import { Component } from 'react';
+import { useState } from 'react';
+import useLocalStorage from './components/Hooks/useLocalStorage';
 import shortid from 'shortid';
 import Container from './components/Container/Container';
 import ContactForm from './components/ContactForm/ContactForm';
 import Filter from './components/Filter/Filter';
 import ContactList from './components/ContactList/ContactList';
 
-class App extends Component {
-  state = {
-    contacts: [],
-    filter: '',
-  };
+function App() {
+  const [contacts, setContacts] = useLocalStorage('contacts', '[]');
+  const [filter, setFilter] = useState('');
 
-  componentDidMount() {
-    const savedContacts = localStorage.getItem('contacts');
-    const parsedContacts = JSON.parse(savedContacts);
-
-    if (parsedContacts) {
-      this.setState({ contacts: parsedContacts });
-    }
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    const nextContacts = this.state.contacts;
-    const prevContacts = prevState.contacts;
-
-    if (nextContacts !== prevContacts) {
-      localStorage.setItem('contacts', JSON.stringify(nextContacts));
-    }
-  }
-
-  addContact = ({ name, number }) => {
-    const contact = {
+  const addContact = ({ name, number }) => {
+    const newContact = {
       id: shortid.generate(),
       name,
       number,
     };
-
-    const { contacts } = this.state;
-
-    const nameExist = contacts.find(
+    const isNameExist = contacts.find(
       contact => contact.name.toLowerCase() === name.toLowerCase()
     );
-    const numberExist = contacts.find(contact => contact.number === number);
-
-    if (nameExist) {
+    const isNumberExist = contacts.find(contact => contact.number === number);
+    if (isNameExist) {
       alert(`${name} is already in contacts.`);
-    } else if (numberExist) {
+    } else if (isNumberExist) {
       alert(`${number} is already in contacts.`);
     } else {
-      this.setState(({ contacts }) => ({
-        contacts: [contact, ...contacts],
-      }));
+      setContacts(prevContacts => [newContact, ...prevContacts]);
     }
   };
 
-  deleteContact = contactId => {
-    this.setState(({ contacts }) => ({
-      contacts: contacts.filter(contact => contact.id !== contactId),
-    }));
-  };
-  changeFilter = e => {
-    this.setState({ filter: e.currentTarget.value });
-  };
-
-  getVisibleContacts = () => {
-    const { contacts, filter } = this.state;
-    const normalizedFilter = filter.toLowerCase();
-
-    return contacts.filter(contact =>
-      contact.name.toLowerCase().includes(normalizedFilter)
+  // Remove contact from the list
+  const deleteContact = contactId => {
+    setContacts(prevContacts =>
+      prevContacts.filter(contact => contact.id !== contactId)
     );
   };
-  render() {
-    const { filter, contacts } = this.state;
-    const visibleContacts = this.getVisibleContacts();
-    const isContactsNotEmpty = contacts.length > 0;
 
-    return (
+  // Update filter
+  const changeFilter = e => {
+    setFilter(e.currentTarget.value);
+  };
+
+  // Filter contacts
+  const visibleContacts = contacts.filter(contact =>
+    contact.name.toLowerCase().includes(filter.toLowerCase())
+  );
+
+  // Check if contacts exist and get contacts length
+  const isContactsExist = contacts.length > 0;
+
+  return (
+    <>
       <Container>
         <h1>Phonebook</h1>
-        <ContactForm onSubmit={this.addContact} />
+        <ContactForm onSubmit={addContact} />
         <h2>Contacts</h2>
-        {contacts.length > 1 && (
-          <Filter value={filter} onChange={this.changeFilter} />
-        )}
-        {isContactsNotEmpty ? (
+        {isContactsExist && <Filter value={filter} onChange={changeFilter} />}
+        {isContactsExist ? (
           <ContactList
             contacts={visibleContacts}
-            onDeleteContact={this.deleteContact}
+            onDeleteContact={deleteContact}
           />
         ) : (
           <p>Your phonebook is empty. Please add contact. </p>
         )}
       </Container>
-    );
-  }
+    </>
+  );
 }
 
 export default App;

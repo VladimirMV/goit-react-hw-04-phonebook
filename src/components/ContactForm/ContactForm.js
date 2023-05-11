@@ -1,82 +1,69 @@
-import { Component } from 'react';
+import { useForm } from 'react-hook-form';
 import PropTypes from 'prop-types';
 import s from './ContactForm.module.css';
+import React from 'react';
 
-class ContactForm extends Component {
-  state = {
-    name: '',
-    number: '',
+function ContactForm({ onSubmit }) {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm({
+    mode: 'onBlur',
+  });
+
+  const onSubmitHandler = data => {
+    onSubmit(data);
+    reset();
   };
 
-  handleChange = e => {
-    const { name, value } = e.currentTarget;
-
-    this.setState({ [name]: value });
-  };
-
-  handleSubmit = e => {
-    e.preventDefault();
-
-    const { name, number } = this.state;
-    const isNameOrNumberEmpty = name.trim() === '' || number.trim() === '';
-    const isIncorrectNumber = !/\d{3}[-]\d{2}[-]\d{2}/g.test(number);
-
-    if (isNameOrNumberEmpty) {
-      alert("Enter the contact's name and number phone!");
-    } else if (isIncorrectNumber) {
-      alert('Enter the correct number phone!');
-    } else {
-      this.props.onSubmit(this.state);
-      this.setState({ name: '', number: '' });
-    }
-  };
-
-  render() {
-    const { name, number } = this.state;
-    return (
-      <form className={s.form} onSubmit={this.handleSubmit}>
-        <label className={s.label}>
-          Name
-          <input
-            className={s.input}
-            type="text"
-            name="name"
-            value={name}
-            onChange={this.handleChange}
-            placeholder="Evgen Vlasov"
-            pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
-            title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
-            required
-          />
-        </label>
-        <label className={s.label}>
-          Number
-          <input
-            className={s.input}
-            type="text"
-            name="number"
-            value={number}
-            onChange={this.handleChange}
-            placeholder="111-11-11"
-          />
-        </label>
-        <button className={s.btn} type="submit">
-          Add contact
-        </button>
-      </form>
-    );
-  }
+  return (
+    <form className={s.form} onSubmit={handleSubmit(onSubmitHandler)}>
+      <label className={s.label}>
+        Name
+        <input
+          className={s.input}
+          type="text"
+          placeholder="Evgen Vlasov"
+          name="name"
+          {...register('name', {
+            required: `This field is required`,
+            pattern: {
+              value:
+                /^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$/,
+              message: 'Enter a valid name',
+            },
+          })}
+        />
+        {errors.name && <p className={s.error}>{errors.name.message}</p>}
+      </label>
+      <label className={s.label}>
+        Number
+        <input
+          className={s.input}
+          type="text"
+          name="number"
+          {...register('number', {
+            required: `This field is required`,
+            minLength: {
+              value: 7,
+              message: `Min 7 numbers. Phone number must be digits and can contain spaces, dashes, parentheses and can start with +`,
+            },
+            pattern:
+              /\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}/,
+          })}
+          placeholder="111-11-11"
+        />
+        {errors.number && <p className={s.error}>{errors.number.message}</p>}
+      </label>
+      <button className={s.btn} type="submit">
+        Add contact
+      </button>
+    </form>
+  );
 }
-
-ContactForm.propTypes = {
+ContactForm.propType = {
   onSubmit: PropTypes.func.isRequired,
 };
-
 export default ContactForm;
-
-// Этот код определяет компонент ContactForm, который представляет собой форму
-// для ввода имени и номера телефона.Компонент принимает функцию обратного вызова onSubmit
-// в качестве свойства и вызывает ее при отправке формы с текущим состоянием имени
-// и номера телефона в качестве аргумента.Когда пользователь вводит имя или номер телефона,
-//   событие onChange вызывает метод handleChange, который обновляет состояние компонента
-// с помощью setState.
