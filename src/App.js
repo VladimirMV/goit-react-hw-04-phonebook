@@ -19,7 +19,9 @@ function App() {
     const isNameExist = contacts.find(
       contact => contact.name.toLowerCase() === name.toLowerCase()
     );
+
     const isNumberExist = contacts.find(contact => contact.number === number);
+
     if (isNameExist) {
       alert(`${name} is already in contacts.`);
     } else if (isNumberExist) {
