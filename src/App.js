@@ -7,7 +7,7 @@ import Filter from './components/Filter/Filter';
 import ContactList from './components/ContactList/ContactList';
 
 function App() {
-  const [contacts, setContacts] = useLocalStorage('contacts', '[]');
+  const [contacts, setContacts] = useLocalStorage('contacts', []);
   const [filter, setFilter] = useState('');
 
   const addContact = ({ name, number }) => {
